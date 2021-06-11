@@ -10,3 +10,4 @@ Router.get("/", getAllProductsController);
 Router.get("/:id", getproductController);
 
 module.exports = Router;
+// Date: Tue Jun 8 10:47:45 2021 +0500
