@@ -5,11 +5,11 @@ const productSchema = new mongose.Schema(
       type: String,
       required: true,
     },
-    prodDesc: {
+    desc: {
       type: String,
       required: true,
     },
-    imgUrl: {
+    img: {
       type: String,
       required: true,
     },
@@ -17,7 +17,7 @@ const productSchema = new mongose.Schema(
       type: Number,
       required: true,
     },
-    inStock: {
+    noOfItemsInStock: {
       type: Number,
       required: true,
     },
