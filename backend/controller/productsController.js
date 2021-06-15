@@ -1,5 +1,5 @@
 const product = require("../models/productModel");
-const getAllProductsController = (req, res) => {
+const getAllProductsController = async (req, res) => {
   try {
     const allproducts = await product.find({});
     if (allproducts) {
@@ -15,7 +15,16 @@ const getAllProductsController = (req, res) => {
     console.log(error);
   }
 };
+const addProduct = async (req, res) => {
+  try {
+    const prod = await product.create(req.body);
+    res.json({ productId: "product added successfully" });
+  } catch (error) {
+    console.log(error);
+    res.json({ error: error.message });
+  }
+};
 const getproductController = (req, res) => {
   res.json({ productId: req.params.id });
 };
-module.exports = { getAllProductsController, getproductController };
+module.exports = { getAllProductsController, addProduct, getproductController };
