@@ -1,9 +1,17 @@
 const product = require("../models/productModel");
 const getAllProductsController = async (req, res) => {
+  console.log(req.query);
   try {
-    const allproducts = await product.find({});
+    const queryString = JSON.stringify(req.query); //converted the object into json so we can perform regex on incomming query
+    const replacedString = queryString.replace(
+      /\b(gt|lt|gte|lte)\b/g, // 1) -> regex is written in between \ \  2) -> \b\b => compare whole word  3) -> g => match whole string (global)
+      (match) => `$${match}`
+    ); // emabded $ sign with (gt|lt|gte|lte)
+    const Query = JSON.parse(replacedString); //again converting it into JS object so we can pass that as query to mongodb
+    const allproducts = await product.find(Query);
     if (allproducts) {
       res.status(200).json({
+        products: allproducts.length,
         data: allproducts,
       });
     } else {
