@@ -9,7 +9,7 @@ const {
 
 Router.get("/", getAllProductsController);
 Router.post("/add-product", addProduct);
-Router.get("/:id", getproductController);
+Router.get("/:_id", getproductController);
 
 module.exports = Router;
 // Date: Tue Jun 8 10:47:45 2021 +0500
