@@ -26,13 +26,19 @@ const getAllProductsController = async (req, res) => {
 const addProduct = async (req, res) => {
   try {
     const prod = await product.create(req.body);
-    res.json({ productId: "product added successfully" });
+    res.json({ productId: "product added successfully", product: prod });
   } catch (error) {
     console.log(error);
     res.json({ error: error.message });
   }
 };
-const getproductController = (req, res) => {
-  res.json({ productId: req.params.id });
+const getproductController = async (req, res) => {
+  try {
+    console.log(req.params);
+    const prodRelatedToId = await product.findOne(req.params.id); //agr url ma id ka sth underscore na lagaty joka db ma field ha to hamy idr hardcode karna parta like /* findOne({ _id:req.params.id})
+    res.json({ product: prodRelatedToId });
+  } catch (error) {
+    console.log(error);
+  }
 };
 module.exports = { getAllProductsController, addProduct, getproductController };
