@@ -1,4 +1,4 @@
-const userDetails = require("../models/userDetails");
+const userDetails = require("../models/userDetailsModel");
 
 const addNewUserDetail = async (req, res) => {
   try {
