@@ -1,4 +1,4 @@
-const user = require("../models/userModel");
+const user = require("../models/userAuthModel");
 const bcrypt = require("bcrypt");
 const loginController = async (req, res) => {
   try {
