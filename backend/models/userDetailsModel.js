@@ -4,19 +4,19 @@ const userSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
-      required: true,
+      required: [true, "User Name field is required"],
     },
     phone: {
       type: Number,
-      required: true,
+      required: [true, "User Phone No. field is required"],
     },
     address: {
       type: String,
-      required: true,
+      required: [true, "User Address field is required"],
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "User Email field is required"],
     },
     favProducs: {
       type: Array,
