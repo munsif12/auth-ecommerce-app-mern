@@ -3,15 +3,14 @@ const productSchema = new mongose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Product Name field is required"],
     },
     desc: {
       type: String,
-      required: true,
     },
     img: {
       type: String,
-      required: true,
+      required: [true, "Product Image field is required"],
     },
     price: {
       type: Number,
