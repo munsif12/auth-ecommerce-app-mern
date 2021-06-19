@@ -6,19 +6,21 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Name field is required"],
     },
     email: {
       type: String,
-      required: true,
+      // unique: true,
+      required: [true, "Email field is required"],
     },
     pass: {
       type: String,
-      required: true,
+      minLength: [8, "Please enter minimum 8 characyers"],
+      required: [true, "Password field is required"],
     },
     cPass: {
       type: String,
-      required: true,
+      required: [true, "Conform password field is required"],
     },
     tokens: [
       {
