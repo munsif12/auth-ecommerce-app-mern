@@ -7,6 +7,7 @@ const userDetails = require("../models/userDetailsModel");
    3 => quering and array ==> collectin.find({favProducts:{$in:['iphone','window']}}) 
    4 => filtering and then sorting ==> collectin.find({productPrice:{$gte:200,$lte:1000}}).sort("-productPrice") +=> ( - ) minus for desc bydefault ascen without
    5 => filds limitation query.select(" names of fileds like age ,name etc") ==> params fields=name,age now if we but minus ( - ) infront of any filed to sirf woh field nhi i ge or baqi aiy ge
+   6 => Pagination
    -*/
 const addNewUserDetail = async (req, res) => {
   try {
@@ -19,7 +20,7 @@ const addNewUserDetail = async (req, res) => {
 };
 const fetchUsersDetails = async (req, res) => {
   try {
-    const { sort, fields, ...restQuery } = req.query;
+    const { sort, fields, page, limit, ...restQuery } = req.query;
     console.log(restQuery);
     const query = JSON.stringify(restQuery);
     const addDollerSign = query.replace(
@@ -46,6 +47,9 @@ const fetchUsersDetails = async (req, res) => {
       user = user.select(fieldsConToStr);
       // console.log(await user);
     }
+    //adding pagination
+    const limit = limit || 2;
+    const page = page || 1;
     user = await user; //now here we are reolving promise after chaining 2 more methods (sort and select)
     res.json({ message: "Success", users: user });
   } catch (error) {
