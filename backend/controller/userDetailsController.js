@@ -50,8 +50,14 @@ const fetchUsersDetails = async (req, res) => {
     //adding pagination
     const limit = limit || 2;
     const page = page || 1;
+    const skipValues = (page - 1) * limit;
+    const totalDocuments = await userDetails.countDocuments();
     user = await user; //now here we are reolving promise after chaining 2 more methods (sort and select)
-    res.json({ message: "Success", users: user });
+    res.json({
+      message: "Success",
+      totalPages: Math.ceil(totalDocuments / limit),
+      users: user,
+    });
   } catch (error) {
     console.log(error);
     res.status(404).json({ error: error.message });
