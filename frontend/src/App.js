@@ -22,10 +22,10 @@ function App() {
           <h4>Sorting</h4>
         </li>
         <li>
-          <h4>Fields selecting shows only required fileds</h4>
+          <h4>Fields selecting -- shows only required fileds</h4>
         </li>
         <li>
-          <h4>MORE TO COME ....</h4>{" "}
+          <h4>Added Advanced Pagination page=1&limit=4</h4>
         </li>
       </ol>
     </div>
