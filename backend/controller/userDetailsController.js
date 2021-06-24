@@ -51,6 +51,7 @@ const fetchUsersDetails = async (req, res) => {
     const limit = limit || 2;
     const page = page || 1;
     const skipValues = (page - 1) * limit;
+    user = user.skip(skipValues).limit(limit);
     const totalDocuments = await userDetails.countDocuments();
     user = await user; //now here we are reolving promise after chaining 2 more methods (sort and select)
     res.json({
