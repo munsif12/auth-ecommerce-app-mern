@@ -18,7 +18,10 @@ const addNewUserDetail = async (req, res) => {
     res.status(404).json({ error: error.message });
   }
 };
+
+//******** MOST IMPORTANT ROUTE ************ */
 const fetchUsersDetails = async (req, res) => {
+  // console.log(req.query);
   try {
     const { sort, fields, page, limit, ...restQuery } = req.query;
     console.log(restQuery);
@@ -48,15 +51,15 @@ const fetchUsersDetails = async (req, res) => {
       // console.log(await user);
     }
     //adding pagination
-    const limit = limit || 2;
-    const page = page || 1;
-    const skipValues = (page - 1) * limit;
-    user = user.skip(skipValues).limit(limit);
-    const totalDocuments = await userDetails.countDocuments();
+    const reqLimit = limit || 2;
+    const reqPage = page || 1;
+    const skipValues = (reqPage - 1) * limit;
+    user = user.skip(skipValues).limit(Number(reqLimit));
+    const totalDocuments = await userDetails.countDocuments(); //to get total documents in collection taka iska use ham totalNoOfPages calculate krny k ley krsaky
     user = await user; //now here we are reolving promise after chaining 2 more methods (sort and select)
     res.json({
       message: "Success",
-      totalPages: Math.ceil(totalDocuments / limit),
+      totalPages: Math.floor(totalDocuments / limit),
       users: user,
     });
   } catch (error) {
