@@ -21,6 +21,13 @@ const userSchema = new mongoose.Schema(
     cPass: {
       type: String,
       required: [true, "Conform password field is required"],
+      validate: {
+        //custom validatory
+        validator: function (cPass) {
+          return this.pass === cPass;
+        },
+        message: "Password arent matching",
+      },
     },
     tokens: [
       {
