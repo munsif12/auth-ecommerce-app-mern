@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       minLength: [8, "Please enter minimum 8 characyers"],
       required: [true, "Password field is required"],
+      select: false,
     },
     cPass: {
       type: String,
@@ -48,12 +49,18 @@ userSchema.pre("save", async function (next) {
   try {
     if (this.isModified("pass")) {
       this.pass = await bcrypt.hash(this.pass, 10);
+      this.cPass = undefined;
     }
     next();
   } catch (error) {
     console.log(`user Password hasing error ${error}`);
   }
 });
+// varifications of password -> we can also implent this feature in controllerfile
+//h=jo document isschema ke base ya structure sa bany ga ussy ya method available hoga
+userSchema.methods.verifyPassword = async (pass, hashPass) => {
+  return await bcrypt.compare(pass, hashPass);
+};
 
 //creating token when user login
 userSchema.methods.generateWebToken = async function () {
