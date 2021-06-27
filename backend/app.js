@@ -17,7 +17,7 @@ app.use("/user", loginRegisterRoute);
 app.use("/user/details", userDetails);
 app.use("/api/v1/products", productsRoutes);
 
-//listening
+//listening to requests at port 8000
 app.listen(PORT, () => {
   console.log(`Server runnig successfully on port : ${PORT}`);
 });
