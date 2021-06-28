@@ -43,9 +43,13 @@ const registerController = async (req, res) => {
       const { pass, ...restUserDetails } = userCreated.toObject();
       //ya hamna isleya keya taka ham password ko response ma na bajy or baji user details ko baj da
       //mogodb sa jo document uth ka ata ha woh BSON form ma hota ha to usko javascript objet ma convert krny ka leya .toObject likhna pary ga
-      const token = await jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      });
+      const token = await jwt.sign(
+        { id: userCreated._id },
+        process.env.SECRET_KEY,
+        {
+          expiresIn: process.env.JWT_EXPIRES_IN,
+        }
+      );
       res
         .status(200)
         .json({ status: "success", token, data: [restUserDetails] });
