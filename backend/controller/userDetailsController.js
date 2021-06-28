@@ -1,5 +1,6 @@
 const userDetails = require("../models/userDetailsModel");
 const ApiFeatures = require("../utility/commonApiFeature");
+const jwt = require("jsonwebtoken");
 
 //concept of advance filtering added in this file like
 /*  
@@ -139,4 +140,24 @@ const fetchUserDetail = async (req, res) => {
     res.status(404).json({ error: error.message });
   }
 };
-module.exports = { fetchUsersDetails, addNewUserDetail, fetchUserDetail };
+//middle ware to check wether user is signedin or not
+function protectAuthMidd(req, res, next) {
+  var token;
+  // 1 fetch token from request header
+  if(req.headers.auth &&req.headers.auth.startsWith("bearer")){
+         token=&req.headers.auth.split(" ")[1]
+  }
+  if(!token){
+    res.status(401).json({ error: "Please sign in first" });
+  }
+  //3 now verify the token
+  const tokenVarification=promisify(jwt.verify)(token,process.env.SECRET_KEY)
+  next();
+}
+
+module.exports = {
+  fetchUsersDetails,
+  addNewUserDetail,
+  fetchUserDetail,
+  protectAuthMidd,
+};
