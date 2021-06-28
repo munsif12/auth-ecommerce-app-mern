@@ -1,6 +1,8 @@
 const userDetails = require("../models/userDetailsModel");
-const ApiFeatures = require("../utility/commonApiFeature");
+// const ApiFeatures = require("../utility/commonApiFeature");
 const jwt = require("jsonwebtoken");
+const { promisify } = require("util");
+require("dotenv").config();
 
 //concept of advance filtering added in this file like
 /*  
@@ -13,57 +15,57 @@ const jwt = require("jsonwebtoken");
    7 => Code cleanups Or using class to reuse the code in multidiff files
    -*/
 
-// class ApiFeatures {
-//   constructor(model, query) {
-//     this.model = model;
-//     this.queryParams = query;
-//     this.query = null;
-//   }
-//   filtration() {
-//     try {
-//       const { sort, fields, page, limit, ...restQuery } = this.queryParams;
-//       this.query = JSON.stringify(restQuery);
-//       const addDollerSign = this.query.replace(
-//         /\b(gt|lt|lte|gte|in|all)\b/g,
-//         (match) => `$${match}`
-//       );
-//       this.query = userDetails.find(JSON.parse(addDollerSign));
-//       return this;
-//     } catch (error) {
-//       res.status(401).json({
-//         error: error.message,
-//       });
-//     }
-//   }
-//   sort() {
-//     if (this.queryParams.sort) {
-//       const sortOn = this.queryParams.sort.split(",").join(" "); //working ParamsComming as ( name,age ) with comma we have to remove them now .split => [ name , age].join(" ") ==> result (name age)  here we removed the comma becoz for sorting and selecting the query is model.select("name agr")
-//       this.query = this.query.sort(sortOn); //still not resolving the promise here bcoz we have one more method to chain which is .select for selecting required firlds
-//     } else {
-//       this.query = this.query.sort("createdAt"); //still not resolving the promise here bcoz we have one more method to chain which is .select for selecting required firlds
-//     }
-//     return this;
-//   }
-//   fieldLimitation() {
-//     if (this.queryParams.fields) {
-//       // console.log(fileds);
-//       const fieldsConToStr = this.queryParams.fields.split(",").join(" "); //working ParamsComming as ( name,age ) with comma we have to remove them now .split => [ name , age].join(" ") ==> result (name age)  here we removed the comma becoz for sorting and selecting the query is model.select("name agr")
-//       this.query = this.query.select(fieldsConToStr);
-//       // console.log(await user);
-//     }
-//     return this;
-//   }
-//   pagination() {
-//     const reqLimit = this.queryParams.limit || 2;
-//     const reqPage = this.queryParams.page || 1;
-//     const skipValues = (reqPage - 1) * reqLimit;
-//     this.query = this.query.skip(skipValues).limit(Number(reqLimit));
-//     return this;
-//   }
-//   get() {
-//     return this.query;
-//   }
-// }
+class ApiFeatures {
+  constructor(model, query) {
+    this.model = model;
+    this.queryParams = query;
+    this.query = null;
+  }
+  filtration() {
+    try {
+      const { sort, fields, page, limit, ...restQuery } = this.queryParams;
+      this.query = JSON.stringify(restQuery);
+      const addDollerSign = this.query.replace(
+        /\b(gt|lt|lte|gte|in|all)\b/g,
+        (match) => `$${match}`
+      );
+      this.query = userDetails.find(JSON.parse(addDollerSign));
+      return this;
+    } catch (error) {
+      res.status(401).json({
+        error: error.message,
+      });
+    }
+  }
+  sort() {
+    if (this.queryParams.sort) {
+      const sortOn = this.queryParams.sort.split(",").join(" "); //working ParamsComming as ( name,age ) with comma we have to remove them now .split => [ name , age].join(" ") ==> result (name age)  here we removed the comma becoz for sorting and selecting the query is model.select("name agr")
+      this.query = this.query.sort(sortOn); //still not resolving the promise here bcoz we have one more method to chain which is .select for selecting required firlds
+    } else {
+      this.query = this.query.sort("createdAt"); //still not resolving the promise here bcoz we have one more method to chain which is .select for selecting required firlds
+    }
+    return this;
+  }
+  fieldLimitation() {
+    if (this.queryParams.fields) {
+      // console.log(fileds);
+      const fieldsConToStr = this.queryParams.fields.split(",").join(" "); //working ParamsComming as ( name,age ) with comma we have to remove them now .split => [ name , age].join(" ") ==> result (name age)  here we removed the comma becoz for sorting and selecting the query is model.select("name agr")
+      this.query = this.query.select(fieldsConToStr);
+      // console.log(await user);
+    }
+    return this;
+  }
+  pagination() {
+    const reqLimit = this.queryParams.limit || 2;
+    const reqPage = this.queryParams.page || 1;
+    const skipValues = (reqPage - 1) * reqLimit;
+    this.query = this.query.skip(skipValues).limit(Number(reqLimit));
+    return this;
+  }
+  get() {
+    return this.query;
+  }
+}
 const addNewUserDetail = async (req, res) => {
   try {
     const user = await userDetails.create(req.body);
@@ -141,19 +143,36 @@ const fetchUserDetail = async (req, res) => {
   }
 };
 //middle ware to check wether user is signedin or not
-function protectAuthMidd(req, res, next) {
-  var token;
-  // 1 fetch token from request header
-  if(req.headers.auth &&req.headers.auth.startsWith("bearer")){
-         token=&req.headers.auth.split(" ")[1]
+async function protectAuthMidd(req, res, next) {
+  try {
+    console.log("inside middleware");
+    var token;
+    // 1 fetch token from request header
+    if (req.headers.auth && req.headers.auth.startsWith("bearer")) {
+      token = req.headers.auth.split(" ")[1];
+    }
+    //2 check if token exists
+    if (!token) {
+      res.status(401).json({
+        error:
+          "Middleware => Please sign in first. AuthToken doen't exists in the header",
+      });
+    }
+    //3 now verify the token
+    const tokenVarification = await promisify(jwt.verify)(
+      token,
+      process.env.SECRET_KEY
+      // ,data=>console.log(data) =>is callback function ko khtm krny ka leya hamna promisify use keya taka woh is callback ko convert krrka hamy promise return krda or phr ham asani sa await use krsaky
+    );
+    console.log(tokenVarification);
+    //4 check if user exists in db
+    const user = await userDetails.findById({ _id: tokenVarification.id });
+
+    next();
+  } catch (error) {
+    res.status(401).json({ error: error.message });
   }
-  if(!token){
-    res.status(401).json({ error: "Please sign in first" });
-  }
-  //3 now verify the token
-  const tokenVarification=promisify(jwt.verify)(token,process.env.SECRET_KEY)
-  next();
-}
+} //now you can use this middleware for authentication anywherer in the codebase i have already used it on productRoutes.js
 
 module.exports = {
   fetchUsersDetails,
