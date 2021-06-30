@@ -7,15 +7,16 @@ class ApiFeatures {
   filtration() {
     try {
       const { sort, fields, page, limit, ...restQuery } = this.queryParams;
+      console.log(restQuery);
       this.query = JSON.stringify(restQuery);
       const addDollerSign = this.query.replace(
         /\b(gt|lt|lte|gte|in|all)\b/g,
         (match) => `$${match}`
       );
-      this.query = userDetails.find(JSON.parse(addDollerSign));
+      this.query = this.model.find(JSON.parse(addDollerSign));
       return this;
     } catch (error) {
-      return error;
+      return error.message;
     }
   }
   sort() {
