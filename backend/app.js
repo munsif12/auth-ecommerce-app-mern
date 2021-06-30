@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 //middlewares
 app.use(express.json());
 //routes middleware
-app.use("/user", loginRegisterRoute);
+app.use("/auth", loginRegisterRoute);
 app.use("/user/details", userDetails);
 app.use("/api/v1/products", productsRoutes);
 
