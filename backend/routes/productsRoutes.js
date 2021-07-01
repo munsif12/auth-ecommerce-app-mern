@@ -1,5 +1,4 @@
 const express = require("express");
-const { protectAuthMidd } = require("../controller/userDetailsController");
 const Router = express.Router();
 
 const {
@@ -8,7 +7,7 @@ const {
   getproductController,
 } = require("../controller/productsController");
 
-Router.get("/", protectAuthMidd, getAllProductsController);
+Router.get("/", getAllProductsController);
 Router.post("/add-product", addProduct);
 Router.get("/:_id", getproductController);
 
