@@ -1,6 +1,8 @@
+const { promisify } = require("util");
 const user = require("../models/userAuthModel");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const ApiFeatures = require("../utility/commonApiFeature");
 const loginController = async (req, res) => {
   try {
     const { email, pass } = req.body;
@@ -65,4 +67,64 @@ const registerController = async (req, res) => {
     });
   }
 };
-module.exports = { loginController, registerController };
+const fetchUsers = async (req, res) => {
+  try {
+    const filter = await new ApiFeatures(user, req.query)
+      .filtration()
+      .sort()
+      .fieldLimitation()
+      .pagination()
+      .get();
+
+    const { sort, fields, page, limit, ...restQuery } = req.query;
+    res.json({
+      message: "Success",
+      totalPages: Math.floor((await user.countDocuments()) / (limit || 2)),
+      users: filter,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ error: error.message });
+  }
+};
+async function protectAuthMidd(req, res, next) {
+  try {
+    console.log("inside middleware");
+    var token;
+    // 1 fetch token from request header
+    if (req.headers.auth && req.headers.auth.startsWith("bearer")) {
+      token = req.headers.auth.split(" ")[1];
+    }
+    //2 check if token exists
+    if (!token) {
+      res.status(401).json({
+        error:
+          "Middleware => Please sign in first. AuthToken doen't exists in the header",
+      });
+    }
+    //3 now verify the token
+    const tokenVarification = await promisify(jwt.verify)(
+      token,
+      process.env.SECRET_KEY
+      // ,data=>console.log(data) =>is callback function ko khtm krny ka leya hamna promisify use keya taka woh is callback ko convert krrka hamy promise return krda or phr ham asani sa await use krsaky
+    );
+    console.log(tokenVarification);
+    //4 check if user exists in db
+    const userDetail = await user.findById({ _id: tokenVarification.id });
+    if (!userDetail) {
+      res
+        .status(401)
+        .json({ error: "user belonging to this email doesnt exists" });
+    }
+    next();
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+} //now you can use this middleware for authentication anywherer in the codebase i have already used it on productRoutes.js
+
+module.exports = {
+  loginController,
+  registerController,
+  fetchUsers,
+  protectAuthMidd,
+};
