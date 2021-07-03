@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema(
         message: "Password arent matching",
       },
     },
+    passwordChangeAt: Date,
     tokens: [
       {
         token: {
