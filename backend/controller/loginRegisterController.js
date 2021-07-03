@@ -69,6 +69,7 @@ const registerController = async (req, res) => {
 };
 const fetchUsers = async (req, res) => {
   try {
+    console.log(req.user); //ya req.user pichly wala middleware add kr ka baj rha h joka page ka last ma define ha protectAuthMidd
     const filter = await new ApiFeatures(user, req.query)
       .filtration()
       .sort()
@@ -89,12 +90,16 @@ const fetchUsers = async (req, res) => {
 };
 async function protectAuthMidd(req, res, next) {
   try {
-    console.log("inside middleware");
+    console.log(req.headers.authorization);
     var token;
     // 1 fetch token from request header
-    if (req.headers.auth && req.headers.auth.startsWith("bearer")) {
-      token = req.headers.auth.split(" ")[1];
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
     }
+    console.log(token);
     //2 check if token exists
     if (!token) {
       res.status(401).json({
@@ -103,19 +108,31 @@ async function protectAuthMidd(req, res, next) {
       });
     }
     //3 now verify the token
-    const tokenVarification = await promisify(jwt.verify)(
+    const { id: userEncId, iat: tokenIsseudAt } = await promisify(jwt.verify)(
       token,
       process.env.SECRET_KEY
       // ,data=>console.log(data) =>is callback function ko khtm krny ka leya hamna promisify use keya taka woh is callback ko convert krrka hamy promise return krda or phr ham asani sa await use krsaky
     );
-    console.log(tokenVarification);
     //4 check if user exists in db
-    const userDetail = await user.findById({ _id: tokenVarification.id });
+    const userDetail = await user.findById(userEncId);
     if (!userDetail) {
       res
         .status(401)
         .json({ error: "user belonging to this email doesnt exists" });
     }
+    //5 is passwword change after token issued
+    var passwordChangeAt = userDetail.passwordChangeAt;
+    if (passwordChangeAt) {
+      var passChangeAfter =
+        userDetail.passwordChangeAt.getTime() > tokenIsseudAt * 1000;
+      if (passChangeAfter) {
+        res
+          .status(401)
+          .json({ error: "Password has been changed please Login again" });
+      }
+    }
+
+    req.user = userDetail; //taka middleware sa agy jab dusra func call hoto uska pass user ka data mojood ho
     next();
   } catch (error) {
     res.status(401).json({ error: error.message });
