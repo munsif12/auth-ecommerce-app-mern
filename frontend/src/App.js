@@ -27,6 +27,18 @@ function App() {
         <li>
           <h4>Added Advanced Pagination page=1&limit=4</h4>
         </li>
+        <li>
+          <h4>Added user authentication middlwware</h4>
+        </li>
+        <li>
+          <h4>Added user authentication middlwware</h4>
+        </li>
+        <li>
+          <h4>
+            Working on forgotten password and generating a link to set their
+            password{" "}
+          </h4>
+        </li>
       </ol>
     </div>
   );
