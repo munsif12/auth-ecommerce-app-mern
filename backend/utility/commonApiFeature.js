@@ -49,3 +49,16 @@ class ApiFeatures {
   }
 }
 module.exports = ApiFeatures;
+
+//pagination
+// const pagination = (req, res, next) => {
+//   const { page, limit } = req.query;
+//   if (!page || !limit) {
+//     res.status(400).json({ error: "page and limit are required" });
+//   }
+//   const start = (page - 1) * limit;
+//   const end = start + limit;
+//   req.query.start = start;
+//   req.query.end = end;
+//   next();
+// };
