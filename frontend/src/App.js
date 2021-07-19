@@ -31,17 +31,19 @@ function App() {
           <h4>Added user authentication middlwware</h4>
         </li>
         <li>
-          <h4>Added user authentication middlwware</h4>
+          <h4>
+            Added Roles for user = user cant access the admin page dpends on
+            role ("admin","buyer","artist")
+          </h4>
         </li>
         <li>
           <h4>
             Working on forgotten password and generating a link to set their
-            password{" "}
+            password
           </h4>
         </li>
       </ol>
     </div>
   );
 }
-
 export default App;
