@@ -8,6 +8,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name field is required"],
     },
+    role: {
+      type: String,
+      required: [true, "Role field is required"],
+      enum: ["artist", "buyer"],
+    },
     email: {
       type: String,
       // unique: true,
