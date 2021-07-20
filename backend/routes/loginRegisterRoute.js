@@ -5,10 +5,16 @@ const {
   registerController,
   fetchUsers,
   protectAuthMidd,
+  AuthenticateRole,
 } = require("../controller/loginRegisterController");
 
 Router.post("/login", loginController);
 Router.post("/register", registerController);
-Router.get("/", protectAuthMidd, fetchUsers);
+Router.get(
+  "/",
+  protectAuthMidd,
+  AuthenticateRole("admin", "artist"),
+  fetchUsers
+);
 
 module.exports = Router;
