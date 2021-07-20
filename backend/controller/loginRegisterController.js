@@ -139,9 +139,27 @@ async function protectAuthMidd(req, res, next) {
   }
 } //now you can use this middleware for authentication anywherer in the codebase i have already used it on productRoutes.js
 
+//WORKING ON ROLES
+
+async function resetpassword() {
+  try {
+    res.status(200).json({ msg: "reset pass working" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+async function forgottenPassword() {
+  try {
+    res.status(200).json({ msg: "forgotten pass working" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
 module.exports = {
   loginController,
   registerController,
   fetchUsers,
   protectAuthMidd,
+  resetpassword,
+  forgottenPassword,
 };
