@@ -139,8 +139,35 @@ async function protectAuthMidd(req, res, next) {
   }
 } //now you can use this middleware for authentication anywherer in the codebase i have already used it on productRoutes.js
 
-//WORKING ON ROLES
-
+//WORKING ON Roles
+const AuthenticateRole =
+  (...roles) =>
+  (req, res, next) => {
+    console.log(req.user.role);
+    const userRole = req.user.role;
+    if (!roles.includes(userRole)) {
+      res
+        .status(401)
+        .json({ error: "You have no rights to access this route" });
+    } else next();
+  };
+//forgotten password
+async function forgottenPassword(req, res) {
+  try {
+    // get the user email
+    const { email } = req.body;
+    //find if the email exists in the db
+    const userExists = await user.findOne({ email });
+    if (!userExists) {
+      res.status(400).json({ error: "User not exists with this email!" });
+    }
+    console.log(userExists);
+    console.log(email);
+    res.status(200).json({ msg: "forgotten pass working" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
 async function resetpassword() {
   try {
     res.status(200).json({ msg: "reset pass working" });
@@ -148,13 +175,7 @@ async function resetpassword() {
     res.status(400).json({ error: error.message });
   }
 }
-async function forgottenPassword() {
-  try {
-    res.status(200).json({ msg: "forgotten pass working" });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-}
+
 module.exports = {
   loginController,
   registerController,
@@ -162,4 +183,5 @@ module.exports = {
   protectAuthMidd,
   resetpassword,
   forgottenPassword,
+  AuthenticateRole,
 };
