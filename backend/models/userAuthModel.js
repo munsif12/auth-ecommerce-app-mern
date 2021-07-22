@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const userSchema = new mongoose.Schema(
@@ -58,6 +59,7 @@ userSchema.methods.passwordResetTokenGenerator = function () {
   // first genereate a random 32bit string
   // encrypt the generated string
   // now save the token into db
+  //retrun no encrypted tooken
 };
 userSchema.pre("save", async function (next) {
   try {
