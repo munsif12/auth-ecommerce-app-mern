@@ -6,6 +6,8 @@ const {
   fetchUsers,
   protectAuthMidd,
   AuthenticateRole,
+  forgottenPassword,
+  resetpassword,
 } = require("../controller/loginRegisterController");
 
 Router.post("/login", loginController);
@@ -16,5 +18,7 @@ Router.get(
   AuthenticateRole("admin", "artist"),
   fetchUsers
 );
-
+Router.post("/forget-password", forgottenPassword);
+Router.post("/reset-password", resetpassword);
+//forgotten
 module.exports = Router;
