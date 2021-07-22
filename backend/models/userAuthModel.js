@@ -36,6 +36,8 @@ const userSchema = new mongoose.Schema(
       },
     },
     passwordChangeAt: Date,
+    passwordResetToken: String,
+    passwordResetTokenExpires: Date,
     tokens: [
       {
         token: {
@@ -51,6 +53,12 @@ const userSchema = new mongoose.Schema(
 );
 /* hashing user password
 all pre methods in mongoose => 1) save 2) remove 3) updateOne 4)deleteOne 5) init (note: init hooks are synchronous) */
+
+userSchema.methods.passwordResetTokenGenerator = function () {
+  // first genereate a random 32bit string
+  // encrypt the generated string
+  // now save the token into db
+};
 userSchema.pre("save", async function (next) {
   try {
     if (this.isModified("pass")) {
