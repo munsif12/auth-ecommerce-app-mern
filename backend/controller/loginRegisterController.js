@@ -3,6 +3,7 @@ const user = require("../models/userAuthModel");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const ApiFeatures = require("../utility/commonApiFeature");
+const sendEmail = require("../utility/email");
 const loginController = async (req, res) => {
   try {
     const { email, pass } = req.body;
@@ -154,6 +155,7 @@ const AuthenticateRole =
 //forgotten password
 async function forgottenPassword(req, res) {
   try {
+    //vedio lecture => 21
     // get the user email
     const { email } = req.body;
     //find if the email exists in the db
@@ -161,9 +163,21 @@ async function forgottenPassword(req, res) {
     if (!userExists) {
       res.status(400).json({ error: "User not exists with this email!" });
     }
-    console.log(userExists);
+    const passwordResetRandomToken = userExists.passwordResetTokenGenerator();
+    await userExists.save({ validateBeforeSave: false }); //doc create ya save hony sa pahly sary validators and middlewares run hoty h isleya ya hamy simple save krny nhi darha q k schema ma password vlaidate horha h isleya hamay validation ko off krdia => save ka ander waly obj ko hata k run krka error check kro
+    //now send the token to user
+    const msg = `Please Click on the link to reset your password ,Note that the link will expire in 10 minutes -> https://localhost:8000/auth/reset-password/${passwordResetRandomToken}`;
+    sendEmail({
+      to: email,
+      subject: "Password reset token",
+      content: msg,
+    });
+    console.log(passwordResetRandomToken);
     console.log(email);
-    res.status(200).json({ msg: "forgotten pass working" });
+    res.status(200).json({
+      status: "success",
+      msg: "Pasword Reset Token has been sent to your email",
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
