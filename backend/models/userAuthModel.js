@@ -57,9 +57,18 @@ all pre methods in mongoose => 1) save 2) remove 3) updateOne 4)deleteOne 5) ini
 
 userSchema.methods.passwordResetTokenGenerator = function () {
   // first genereate a random 32bit string
+  const resetToken = crypto.randomBytes(32).toString("hex");
   // encrypt the generated string
+  const encryptedResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
   // now save the token into db
+  this.passwordResetToken = encryptedResetToken;
+  //save the expiry date into db
+  this.passwordResetTokenExpires = Date.now() + 10 * 60 * 1000;
   //retrun no encrypted tooken
+  return resetToken;
 };
 userSchema.pre("save", async function (next) {
   try {
