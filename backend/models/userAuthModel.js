@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      required: [true, "Role field is required"],
+      // required: [true, "Role field is required"],
       enum: ["artist", "buyer"],
     },
     email: {
