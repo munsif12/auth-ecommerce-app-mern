@@ -19,6 +19,6 @@ Router.get(
   fetchUsers
 );
 Router.post("/forget-password", forgottenPassword);
-Router.post("/reset-password", resetpassword);
+Router.post("/reset-password/:passwordResetToken", resetpassword);
 //forgotten
 module.exports = Router;
