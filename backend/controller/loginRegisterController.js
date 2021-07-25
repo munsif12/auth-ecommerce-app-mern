@@ -187,7 +187,7 @@ async function resetpassword(req, res) {
   try {
     //get the token comming from params
     const { passwordResetToken } = req.params;
-    const { pass, cPass } = req.body;
+    const { pass: password, cPass } = req.body;
     // bcoz the token isnt encrypted and the token inside the db is encrypted so first encrypt and then match the comming token with the user db one
     const encryptedResetToken = crypto
       .createHash("sha256")
@@ -198,18 +198,33 @@ async function resetpassword(req, res) {
       passwordResetToken: encryptedResetToken,
       passwordResetTokenExpires: { $gt: Date.now() },
     });
+    const { pass, ...restUserDetails } = userExists.toObject(); //to remove passwrd before sending response to user => toObject is used to convert bson to javascript
     if (!userExists) {
       res.status(200).json({
         message: `Your token isn't valid or the token has been expired`,
       });
     }
     //now if everything is good then take the new user passwords and save then into database
-    userExists.pass = pass; //ya ham password validation check isleya nhi karwarhy q ka schema ma validation horhe h or jab b save method call hoga tab validators or middle ware run hony to khud bakhud pass or cPass check hojai ga
+    userExists.pass = password; //ya ham password validation check isleya nhi karwarhy q ka schema ma validation horhe h or jab b save method call hoga tab validators or middle ware run hony to khud bakhud pass or cPass check hojai ga
     userExists.cPass = cPass; //or isetrah jab b kabhe passwrod change hoga to password khud he ecryypt hojai ga q ka schema method bana hu h pass enc ka jisma likha ha if(isModified(pass)){} isleya encrypt b hojai ga pass
     userExists.passwordResetToken = undefined;
     userExists.passwordResetTokenExpires = undefined;
+    //login user again with fresh jwt token
+    const token = await jwt.sign(
+      { id: userExists._id },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      }
+    );
     await userExists.save();
-    res.status(200).json({ message: "Password Reset Successfully" });
+    res.status(200).json({
+      message: "Password Reset Successfully ",
+      token,
+      data: {
+        user: restUserDetails,
+      },
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
