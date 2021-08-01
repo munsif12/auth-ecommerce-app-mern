@@ -5,6 +5,33 @@ require("dotenv").config();
 const ApiFeatures = require("../utility/commonApiFeature");
 const sendEmail = require("../utility/email");
 const crypto = require("crypto");
+
+// 2 -> main function start
+function signJwtToken(user) {
+  return jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+}
+async function createAndSendResponse(user, res) {
+  const token = await signJwtToken(user);
+  const { pass, ...restUserDetails } = user.toObject();
+  //ya hamna isleya keya taka ham password ko response ma na bajy or baji user details ko baj da
+  //mogodb sa jo document uth ka ata ha woh BSON form ma hota ha to usko javascript objet ma convert krny ka leya .toObject likhna pary ga
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + Number(process.env.COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000
+    ),
+    secure: process.env.NODE_ENV === "development" ? true : false,
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    status: "Success",
+    token,
+    data: [restUserDetails],
+  });
+}
+// 2 -> main function end
 const loginController = async (req, res) => {
   try {
     const { email, pass } = req.body;
@@ -12,20 +39,8 @@ const loginController = async (req, res) => {
     const passMatching = await userExists.verifyPassword(pass, userExists.pass); //userExist 1 document ha joka userSchema ka methods ko access krsakta h q ka userExist dcument userSchema ka structure pa bana hua h -> schema method ka through password ko verify krwadia
     if (userExists && (passMatching || pass === userExists.pass)) {
       // const gernerateJwtToken = await userExists.generateWebToken(); //generates jwt token for user
-      const token = await jwt.sign(
-        { id: userExists._id },
-        process.env.SECRET_KEY,
-        {
-          expiresIn: process.env.JWT_EXPIRES_IN,
-        }
-      );
-      const { pass, ...restUserDetails } = userExists.toObject();
-      res.status(200).json({
-        status: "Success",
-        token,
-        message: "Login successfull!",
-        data: [restUserDetails],
-      });
+
+      createAndSendResponse(userExists, res); //main function which will create jwt and create cookie and also send the response to the user
     } else {
       res.status(404).json({ message: "Invalid Details" });
     }
@@ -44,19 +59,8 @@ const registerController = async (req, res) => {
       // const newuser = new user(req.body); if you want create an is=nastance of user like creating a new user
       const userCreated = await user.create(req.body); //ya line user create b krda ge or middle ware ka through password ko b hash krda ge
       // await userCreated.save(); //no need to write this line jasy hamy pichly project ma keya h 1_MERN_STSCK ma
-      const { pass, ...restUserDetails } = userCreated.toObject();
-      //ya hamna isleya keya taka ham password ko response ma na bajy or baji user details ko baj da
-      //mogodb sa jo document uth ka ata ha woh BSON form ma hota ha to usko javascript objet ma convert krny ka leya .toObject likhna pary ga
-      const token = await jwt.sign(
-        { id: userCreated._id },
-        process.env.SECRET_KEY,
-        {
-          expiresIn: process.env.JWT_EXPIRES_IN,
-        }
-      );
-      res
-        .status(200)
-        .json({ status: "success", token, data: [restUserDetails] });
+
+      createAndSendResponse(userCreated, res); //main function which will create jwt and create cookie and also send the response to the user
     } else {
       res.status(400).json({
         message: "email already exists try another one",
@@ -173,8 +177,6 @@ async function forgottenPassword(req, res) {
       subject: "Password reset token",
       content: msg,
     });
-    console.log(passwordResetRandomToken);
-    console.log(email);
     res.status(200).json({
       status: "success",
       msg: "Pasword Reset Token has been sent to your email",
@@ -198,7 +200,7 @@ async function resetpassword(req, res) {
       passwordResetToken: encryptedResetToken,
       passwordResetTokenExpires: { $gt: Date.now() },
     });
-    const { pass, ...restUserDetails } = userExists.toObject(); //to remove passwrd before sending response to user => toObject is used to convert bson to javascript
+    // const { pass, ...restUserDetails } = userExists.toObject(); //to remove passwrd before sending response to user => toObject is used to convert bson to javascript
     if (!userExists) {
       res.status(200).json({
         message: `Your token isn't valid or the token has been expired`,
@@ -209,42 +211,33 @@ async function resetpassword(req, res) {
     userExists.cPass = cPass; //or isetrah jab b kabhe passwrod change hoga to password khud he ecryypt hojai ga q ka schema method bana hu h pass enc ka jisma likha ha if(isModified(pass)){} isleya encrypt b hojai ga pass
     userExists.passwordResetToken = undefined;
     userExists.passwordResetTokenExpires = undefined;
-    //login user again with fresh jwt token
-    const token = await jwt.sign(
-      { id: userExists._id },
-      process.env.SECRET_KEY,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      }
-    );
     await userExists.save();
-    res.cookie("jwt", token, {
-      expires: new Date(
-        Date.now() + Number(process.env.COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000
-      ),
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production" ? true : false,
-    });
-    res.status(200).json({
-      message: "Password Reset Successfully ",
-      token,
-      data: {
-        user: restUserDetails,
-      },
-    });
+    //save the token inside the token bcause cookie are secure then localstoreage
+
+    createAndSendResponse(userExists, res); //main function which will create jwt and create cookie and also send the response to the user
   } catch (error) {
     // userExists.passwordResetToken = undefined;
     // userExists.passwordResetTokenExpires = undefined;
     res.status(400).json({ error: error.message });
   }
 }
+function updatePassword(req, res) {
+  try {
+    res.status(200).json({
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
 
 module.exports = {
+  protectAuthMidd,
   loginController,
   registerController,
   fetchUsers,
-  protectAuthMidd,
-  resetpassword,
-  forgottenPassword,
   AuthenticateRole,
+  forgottenPassword,
+  resetpassword,
+  updatePassword,
 };
