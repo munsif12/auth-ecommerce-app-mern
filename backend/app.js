@@ -12,7 +12,7 @@ connection();
 const PORT = process.env.PORT || 5000;
 //middlewares
 app.use(express.json());
-// app.use(cookieParser());
+app.use(cookieParser());
 //routes middleware
 app.use("/auth", loginRegisterRoute);
 app.use("/user/details", userDetails);
