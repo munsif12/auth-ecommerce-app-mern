@@ -218,6 +218,13 @@ async function resetpassword(req, res) {
       }
     );
     await userExists.save();
+    res.cookie("jwt", token, {
+      expires: new Date(
+        Date.now() + Number(process.env.COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000
+      ),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production" ? true : false,
+    });
     res.status(200).json({
       message: "Password Reset Successfully ",
       token,
@@ -226,6 +233,8 @@ async function resetpassword(req, res) {
       },
     });
   } catch (error) {
+    // userExists.passwordResetToken = undefined;
+    // userExists.passwordResetTokenExpires = undefined;
     res.status(400).json({ error: error.message });
   }
 }
