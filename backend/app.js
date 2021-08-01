@@ -1,7 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const app = express();
-
+const cookieParser = require("cookie-parser");
 //importing routes
 const loginRegisterRoute = require("./routes/loginRegisterRoute");
 const productsRoutes = require("./routes/productsRoutes");
@@ -12,6 +12,7 @@ connection();
 const PORT = process.env.PORT || 5000;
 //middlewares
 app.use(express.json());
+// app.use(cookieParser());
 //routes middleware
 app.use("/auth", loginRegisterRoute);
 app.use("/user/details", userDetails);
