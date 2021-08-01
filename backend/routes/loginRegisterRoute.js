@@ -8,6 +8,7 @@ const {
   AuthenticateRole,
   forgottenPassword,
   resetpassword,
+  updatePassword,
 } = require("../controller/loginRegisterController");
 
 Router.post("/login", loginController);
@@ -20,5 +21,6 @@ Router.get(
 );
 Router.post("/forget-password", forgottenPassword);
 Router.post("/reset-password/:passwordResetToken", resetpassword);
+Router.post("/update-password", updatePassword);
 //forgotten
 module.exports = Router;
