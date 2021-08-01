@@ -39,14 +39,6 @@ const userSchema = new mongoose.Schema(
     passwordChangeAt: Date,
     passwordResetToken: String,
     passwordResetTokenExpires: Date,
-    tokens: [
-      {
-        token: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
   },
   {
     timestamps: true,
@@ -70,6 +62,18 @@ userSchema.methods.passwordResetTokenGenerator = function () {
   //retrun no encrypted tooken
   return resetToken;
 };
+userSchema.pre("save", async function (next) {
+  //this pre middle ware is created for resetpassword
+  try {
+    if (this.isModified("pass") && this.isNew) {
+      /* this.isNew means ka document kya new bana h yani fresh ha  */
+      this.passwordChangeAt = Date.now() - 1000;
+    }
+    next();
+  } catch (error) {
+    console.log(`user Password Changed at error ${error}`);
+  }
+});
 userSchema.pre("save", async function (next) {
   try {
     if (this.isModified("pass")) {
