@@ -21,6 +21,6 @@ Router.get(
 );
 Router.post("/forget-password", forgottenPassword);
 Router.post("/reset-password/:passwordResetToken", resetpassword);
-Router.post("/update-password", updatePassword);
+Router.post("/update-password", protectAuthMidd, updatePassword);
 //forgotten
 module.exports = Router;
