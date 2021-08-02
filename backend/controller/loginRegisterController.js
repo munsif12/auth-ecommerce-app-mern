@@ -75,7 +75,7 @@ const registerController = async (req, res) => {
 };
 const fetchUsers = async (req, res) => {
   try {
-    console.log(req.user); //ya req.user pichly wala middleware add kr ka baj rha h joka page ka last ma define ha protectAuthMidd
+    // console.log(req.user); ya req.user pichly wala middleware add kr ka baj rha h joka page ka last ma define ha protectAuthMidd
     const filter = await new ApiFeatures(user, req.query)
       .filtration()
       .sort()
@@ -105,7 +105,7 @@ async function protectAuthMidd(req, res, next) {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
-    console.log(token);
+    // console.log(token);
     //2 check if token exists
     if (!token) {
       res.status(401).json({
@@ -120,7 +120,7 @@ async function protectAuthMidd(req, res, next) {
       // ,data=>console.log(data) =>is callback function ko khtm krny ka leya hamna promisify use keya taka woh is callback ko convert krrka hamy promise return krda or phr ham asani sa await use krsaky
     );
     //4 check if user exists in db
-    const userDetail = await user.findById(userEncId);
+    const userDetail = await user.findById(userEncId).select("+pass");
     if (!userDetail) {
       res
         .status(401)
@@ -221,11 +221,26 @@ async function resetpassword(req, res) {
     res.status(400).json({ error: error.message });
   }
 }
-function updatePassword(req, res) {
+async function updatePassword(req, res) {
   try {
-    res.status(200).json({
-      message: "Password updated successfully",
-    });
+    const { currentPass, newPass, confirmNewPass } = req.body;
+    const userExists = await user.findOne(req.user._id);
+    const passMatch = await userExists.verifyPassword(
+      currentPass,
+      req.user.pass
+    );
+    if (!passMatch) {
+      res.status(400).json({
+        message: "Your current passord is wrong",
+      });
+    } else {
+      userExists.pass = newPass;
+      userExists.cPass = confirmNewPass;
+      await userExists.save();
+      res.status(400).json({
+        message: "Password Updated Successfully",
+      });
+    }
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
