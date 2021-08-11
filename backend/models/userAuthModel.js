@@ -41,6 +41,7 @@ const userSchema = new mongoose.Schema(
     passwordResetTokenExpires: Date,
   },
   {
+    collection: "users",
     timestamps: true,
   }
 );
@@ -114,5 +115,5 @@ userSchema.methods.generateWebToken = async function () {
   }
 };
 
-const user = mongoose.model("user", userSchema);
+const user = mongoose.model("user", userSchema, "users");
 module.exports = user;
