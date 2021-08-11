@@ -6,6 +6,7 @@ const connection = () => {
       .connect(process.env.DB_CONN_URL, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        useFindAndModify: false,
       })
       .then(() => {
         console.log("Connection to mongoDB success");
