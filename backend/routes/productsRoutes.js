@@ -13,7 +13,10 @@ const {
   protectAuthMidd,
   AuthenticateRole,
 } = require("../controller/loginRegisterController");
-
+const reviewsRoute = require("./reviewsRoute");
+//middleware
+Router.use("/:id/review", reviewsRoute);
+//all routes
 Router.get("/", getAllProductsController); //everyone can access this route login or not login
 Router.post(
   "/add-product",
