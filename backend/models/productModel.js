@@ -47,9 +47,9 @@ const productSchema = new mongose.Schema(
 //virtual properties have bith getter and setter methods. getter method is used to get the value of the virtual property. and setter method is used to set the value of the virtual property.
 // --> productSchema.virtual("reviews").get(function () {}).set(function () {}); <-- this is for virtual properties
 //just uncomment the below code and run the app and you will see the difference in the database and the response result
-// productSchema.virtual("reviews").get(function () {
-//   return `${this.name} --> for for understing virtual properties`;
-// });
+productSchema.virtual("virtaul-Fields").get(function () {
+  return `${this.name} --> for for understing virtual properties`;
+});
 
 //now virtual populate example
 productSchema.virtual("reviews", {
