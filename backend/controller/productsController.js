@@ -39,9 +39,11 @@ const addProduct = async (req, res) => {
 const getproductController = async (req, res) => {
   try {
     console.log(req.params);
-    const prodRelatedToId = await product.findById(
-      req.params.id
-    ); /* .populate({
+    const resProduct = await product
+      .findById(req.params.id)
+      .populate("reviews");
+    console.log(resProduct);
+    /* .populate({
       path: "artist",
       select: "name email",
     });  */
@@ -54,7 +56,7 @@ const getproductController = async (req, res) => {
     population ya sab kam hamy 2 line ma krka darha h 
      */
     //agr url ma id ka sth underscore na lagaty joka db ma field ha to hamy idr hardcode karna parta like /* findOne({ _id:req.params.id})
-    res.status(200).json({ product: prodRelatedToId });
+    res.status(200).json({ resProduct });
   } catch (error) {
     console.log("get product error");
     console.log(error);
