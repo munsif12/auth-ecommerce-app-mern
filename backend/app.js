@@ -17,6 +17,7 @@ const limiter = rateLimit({
 const loginRegisterRoute = require("./routes/loginRegisterRoute");
 const productsRoutes = require("./routes/productsRoutes");
 const userDetails = require("./routes/userDetailsRoutes");
+const reviewsRoutes = require("./routes/reviewsRoute");
 //making connection to db
 const connection = require("./config/db");
 connection();
@@ -31,6 +32,7 @@ app.use(xss());
 app.use("/auth", loginRegisterRoute);
 app.use("/user/details", userDetails);
 app.use("/api/v1/products", productsRoutes);
+// app.use("/api/v1/reviews", reviewsRoutes); //used nested routing  go check inside products route u will find /:id/reviews
 
 //listening to requests at port 8000
 app.listen(PORT, () => {
