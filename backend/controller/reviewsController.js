@@ -1,8 +1,8 @@
 const review = require("../models/reviewsModel");
-const getReview = (req, res) => {
+const { find } = require("../models/userAuthModel");
+const getReview = async (req, res) => {
   try {
-    console.log(req.body.user._id);
-    res.status(200).json({ msg: `${req.body.user._id} --- ${req.params.id}` });
+    res.status(200).json(await review.find({ productId: req.params.id }));
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -14,6 +14,7 @@ const addReview = async (req, res) => {
 
     req.body.productId = productId; //ya isleya ka review ka time user ko prodcuId or UserId send na krna pry usedId hamy jwt sa mily or ProductId hmy params sa mily ga iska or or b fida h woh ya ka sirf logid in user he review add krsakta h
     req.body.reviewedBy = userId;
+
     const Review = await review.create(req.body);
     res.status(400).json({ Review });
   } catch (error) {
