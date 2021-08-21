@@ -18,6 +18,8 @@ const loginRegisterRoute = require("./routes/loginRegisterRoute");
 const productsRoutes = require("./routes/productsRoutes");
 const userDetails = require("./routes/userDetailsRoutes");
 const reviewsRoutes = require("./routes/reviewsRoute");
+const buyerRoutes = require("./routes/buyerRoute");
+const productOwner = require("./routes/productOwnerRoute");
 //making connection to db
 const connection = require("./config/db");
 connection();
@@ -33,7 +35,8 @@ app.use("/auth", loginRegisterRoute);
 app.use("/user/details", userDetails);
 app.use("/api/v1/products", productsRoutes);
 // app.use("/api/v1/reviews", reviewsRoutes); //used nested routing  go check inside products route u will find /:id/reviews
-
+app.use("/api/v1/buyer", buyerRoutes);
+app.use("/api/v1/product-owner", productOwner);
 //listening to requests at port 8000
 app.listen(PORT, () => {
   console.log(`Server runnig successfully on port : ${PORT}`);
