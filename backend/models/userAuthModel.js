@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       // unique: true,
       required: [true, "Email field is required"],
     },
+    profileImage: {
+      type: String,
+      default: "default.jpg",
+    },
     pass: {
       type: String,
       minLength: [8, "Please enter minimum 8 characyers"],
