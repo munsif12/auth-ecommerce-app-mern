@@ -1,7 +1,7 @@
 const productOwner = require("./../models/productOwnerModel");
 const fetchProductOwner = (req, res) => {
   try {
-    res.status(200).json({ message: "working po" });
+    res.status(200).json({ message: "product owner route working" });
   } catch (error) {
     res.status(200).json({ error: error.message });
   }
@@ -9,8 +9,8 @@ const fetchProductOwner = (req, res) => {
 
 const addProductOwner = async (req, res) => {
   try {
-    const po = await productOwner.create(req.body);
-    res.status(200).json({ message: "success", data: po });
+    const ProductOwner = await productOwner.create(req.body);
+    res.status(200).json({ message: "success", data: ProductOwner });
   } catch (error) {
     res.status(200).json({ error: error.message });
   }
