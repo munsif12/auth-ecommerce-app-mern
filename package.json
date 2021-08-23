@@ -21,7 +21,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "runServer": "nodemon backend/app.js",
+    "runServer": "nodemon backend/server.js",
     "runFrontend": "npm start --prefix frontend",
     "dev": "concurrently \" npm run runServer \" \"npm run runFrontend \" "
   },
