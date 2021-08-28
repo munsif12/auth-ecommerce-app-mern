@@ -5,6 +5,8 @@ require("dotenv").config();
 const ApiFeatures = require("../utility/commonApiFeature");
 const sendEmail = require("../utility/email");
 const crypto = require("crypto");
+const { addProductOwner } = require("./productOwnerController");
+const { addBuyer } = require("./buyerController");
 
 // 2 -> main function start
 function signJwtToken(user) {
@@ -60,6 +62,15 @@ const registerController = async (req, res) => {
       const userCreated = await user.create(req.body); //ya line user create b krda ge or middle ware ka through password ko b hash krda ge
       // await userCreated.save(); //no need to write this line jasy hamy pichly project ma keya h 1_MERN_STSCK ma
 
+      /* Profile creation */
+      const profile = {
+        userID: userCreated._id,
+        username: userCreated.name,
+        email: userCreated.email,
+      };
+      if (userCreated.role === "productowner")
+        var artis = await addProductOwner(profile);
+      if (userCreated.role === "buyer") var artis = await addBuyer(profile);
       createAndSendResponse(userCreated, res); //main function which will create jwt and create cookie and also send the response to the user
     } else {
       res.status(400).json({
