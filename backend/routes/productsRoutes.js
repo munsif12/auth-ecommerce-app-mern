@@ -21,7 +21,7 @@ Router.get("/", getAllProductsController); //everyone can access this route logi
 Router.post(
   "/add-product",
   protectAuthMidd,
-  AuthenticateRole("artist"),
+  AuthenticateRole("artist", "productowner"),
   addProduct
 );
 Router.get("/:id", getproductController);
