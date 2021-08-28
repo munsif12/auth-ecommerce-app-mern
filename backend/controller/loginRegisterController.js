@@ -5,18 +5,20 @@ require("dotenv").config();
 const ApiFeatures = require("../utility/commonApiFeature");
 const sendEmail = require("../utility/email");
 const crypto = require("crypto");
-const { addProductOwner } = require("./productOwnerController");
-const { addBuyer } = require("./buyerController");
+const {
+  addProductOwner,
+  fetchProductOwner,
+} = require("./productOwnerController");
+const { addBuyer, fetchBuyer } = require("./buyerController");
 
 // 2 -> main function start
-function signJwtToken(user) {
-  return jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+function signJwtToken(userId) {
+  return jwt.sign({ id: userId }, process.env.SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 }
 async function createAndSendResponse(user, res) {
-  const token = await signJwtToken(user);
-  const { pass, ...restUserDetails } = user.toObject();
+  const token = await signJwtToken(user.userId);
   //ya hamna isleya keya taka ham password ko response ma na bajy or baji user details ko baj da
   //mogodb sa jo document uth ka ata ha woh BSON form ma hota ha to usko javascript objet ma convert krny ka leya .toObject likhna pary ga
   res.cookie("jwt", token, {
@@ -30,7 +32,7 @@ async function createAndSendResponse(user, res) {
   res.status(200).json({
     status: "Success",
     token,
-    data: [restUserDetails],
+    data: user,
   });
 }
 // 2 -> main function end
@@ -41,8 +43,14 @@ const loginController = async (req, res) => {
     const passMatching = await userExists.verifyPassword(pass, userExists.pass); //userExist 1 document ha joka userSchema ka methods ko access krsakta h q ka userExist dcument userSchema ka structure pa bana hua h -> schema method ka through password ko verify krwadia
     if (userExists && (passMatching || pass === userExists.pass)) {
       // const gernerateJwtToken = await userExists.generateWebToken(); //generates jwt token for user
-
-      createAndSendResponse(userExists, res); //main function which will create jwt and create cookie and also send the response to the user
+      /* Sending profile data */
+      var userProfile = null;
+      if (userExists.role === "productowner")
+        userProfile = await fetchProductOwner(userExists._id);
+      if (userExists.role === "buyer")
+        userProfile = await fetchBuyer(userExists._id);
+      /* Sending profile data */
+      createAndSendResponse(userProfile, res); //main function which will create jwt and create cookie and also send the response to the user
     } else {
       res.status(404).json({ message: "Invalid Details" });
     }
@@ -64,15 +72,16 @@ const registerController = async (req, res) => {
 
       /* Profile creation */
       const profile = {
-        userID: userCreated._id,
-        username: userCreated.name,
+        userId: userCreated._id,
+        name: userCreated.name,
         email: userCreated.email,
       };
+      var userProfile = null;
       if (userCreated.role === "productowner")
-        var artis = await addProductOwner(profile);
-      if (userCreated.role === "buyer") var artis = await addBuyer(profile);
+        userProfile = await addProductOwner(profile);
+      if (userCreated.role === "buyer") userProfile = await addBuyer(profile);
       /* Profile creation end */
-      createAndSendResponse(userCreated, res); //main function which will create jwt and create cookie and also send the response to the user
+      createAndSendResponse(userProfile, res); //main function which will create jwt and create cookie and also send the response to the user
     } else {
       res.status(400).json({
         message: "email already exists try another one",
