@@ -1,14 +1,21 @@
 const buyer = require("./../models/buyerModel");
-const fetchBuyer = (req, res) => {
-  res.status(200).json({ message: "working" });
+const fetchBuyer = async (buyerId) => {
+  try {
+    console.log("inside fetchbuyer");
+    const Buyer = await buyer.findOne({ userId: buyerId });
+    console.log(Buyer);
+    return Buyer;
+  } catch (error) {
+    return new Error(error.message);
+  }
 };
 
-const addBuyer = async (req, res) => {
+const addBuyer = async (profile) => {
   try {
-    const Buyer = await buyer.create(req.body);
-    res.status(200).json({ message: "success", data: Buyer });
+    const Buyer = await buyer.create(profile);
+    return Buyer;
   } catch (error) {
-    res.status(200).json({ error: error.message });
+    return new Error(error.message);
   }
 };
 module.exports = { fetchBuyer, addBuyer };

@@ -1,7 +1,7 @@
 const productOwner = require("./../models/productOwnerModel");
-const fetchProductOwner = (req, res) => {
+const fetchProductOwner = async (productOwnerId) => {
   try {
-    const ProductOwner = await productOwner.create(profile);
+    const ProductOwner = await productOwner.findOne({ userId: productOwnerId });
     return ProductOwner;
   } catch (error) {
     return new Error(error.message);
