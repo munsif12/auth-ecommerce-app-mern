@@ -71,6 +71,7 @@ const registerController = async (req, res) => {
       if (userCreated.role === "productowner")
         var artis = await addProductOwner(profile);
       if (userCreated.role === "buyer") var artis = await addBuyer(profile);
+      /* Profile creation end */
       createAndSendResponse(userCreated, res); //main function which will create jwt and create cookie and also send the response to the user
     } else {
       res.status(400).json({

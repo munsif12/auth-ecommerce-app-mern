@@ -7,9 +7,9 @@ const fetchProductOwner = (req, res) => {
   }
 };
 
-const addProductOwner = async (req, res) => {
+const addProductOwner = async (profile) => {
   try {
-    const ProductOwner = await productOwner.create(req.body);
+    const ProductOwner = await productOwner.create(profile);
     res.status(200).json({ message: "success", data: ProductOwner });
   } catch (error) {
     res.status(200).json({ error: error.message });

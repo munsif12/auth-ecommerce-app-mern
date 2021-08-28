@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       // required: [true, "Role field is required"],
-      enum: ["artist", "buyer"],
+      enum: ["artist", "buyer", "productowner"],
     },
     email: {
       type: String,
