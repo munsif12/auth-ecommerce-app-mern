@@ -8,6 +8,7 @@ const {
   getproductController,
   likeProduct,
   dislikeProduct,
+  imageUpload,
 } = require("../controller/productsController");
 const {
   protectAuthMidd,
@@ -22,6 +23,7 @@ Router.post(
   "/add-product",
   protectAuthMidd,
   AuthenticateRole("artist", "productowner"),
+  imageUpload,
   addProduct
 );
 Router.get("/:id", getproductController);
