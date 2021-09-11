@@ -1,4 +1,18 @@
 const product = require("../models/productModel");
+const multer = require("multer");
+const fs = require("fs");
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, `${__dirname}/public/images/`);
+  },
+  filename: (req, file, callback) => {
+    console.log(file);
+    const fileExtentsion = file.mimetype.split("/")[1];
+    console.log(fileExtentsion);
+    callback(null, `image-${req.user._id}-${Date.now()}.${fileExtentsion}`);
+  },
+});
+const imageUpload = multer({ storage: storage }).any();
 const getAllProductsController = async (req, res) => {
   console.log(req.query);
   try {
@@ -106,10 +120,12 @@ const dislikeProduct = async (req, res) => {
     console.log(err);
   }
 };
+const addproductPicture = (req, res) => {};
 module.exports = {
   getAllProductsController,
   addProduct,
   getproductController,
   likeProduct,
   dislikeProduct,
+  imageUpload,
 };
