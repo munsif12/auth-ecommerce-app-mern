@@ -1,18 +1,26 @@
 const product = require("../models/productModel");
 const multer = require("multer");
 const fs = require("fs");
-const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, `${__dirname}/public/images/`);
-  },
-  filename: (req, file, callback) => {
-    console.log(file);
-    const fileExtentsion = file.mimetype.split("/")[1];
-    console.log(fileExtentsion);
-    callback(null, `image-${req.user._id}-${Date.now()}.${fileExtentsion}`);
-  },
-});
-const imageUpload = multer({ storage: storage }).any();
+const { awsImageUploader } = require("../utility/AWS-image-upload");
+
+/* If you want to storge images in dish you can use the below function but now i am using memory | buffer */
+
+//defined what type of storage u want dish|memory if disk thenn specify the path where to store the file and the filename if you want tot modify
+// const storage = multer.diskStorage({
+//   destination: (req, file, callback) => {
+//     callback(null, `${__dirname}/public/images/`);
+//   },
+//   filename: (req, file, callback) => {
+//     console.log(file);
+//     const fileExtentsion = file.mimetype.split("/")[1];
+//     console.log(fileExtentsion);
+//     callback(null, `image-${req.user._id}-${Date.now()}.${fileExtentsion}`);
+//   },
+// });
+// const imageUpload = multer({ storage: storage }).any();
+
+const storage = multer.memoryStorage();
+const imageUpload = multer({ storage }).any();
 const getAllProductsController = async (req, res) => {
   console.log(req.query);
   try {
@@ -39,12 +47,17 @@ const getAllProductsController = async (req, res) => {
 };
 const addProduct = async (req, res) => {
   try {
+    // console.log(req.body);
+    // console.log(req.file);
+    console.log(req.files);
+    const uploadImageToS3 = await awsImageUploader(req.files[0]);
+    console.log(uploadImageToS3);
     // pichly authentication middle ware my userdetail add hohe h to waha sa ham userId nikal laga or refrence add krda ga db ma konsa sa user product add krrha h
-    const userId = req.user._id;
-    req.body.artist = userId;
-    const prod = await product.create(req.body);
-    console.log(req.body);
-    res.json({ productId: "product added successfully", product: prod });
+    // const userId = req.user._id;
+    // req.body.artist = userId;
+    // const prod = await product.create(req.body);
+    // console.log(req.body);
+    res.json({ productId: "product added successfully" /* , product: prod */ });
   } catch (error) {
     console.log(error);
     res.status(200).json({ error: error.message });
