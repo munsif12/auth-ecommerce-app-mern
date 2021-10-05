@@ -42,6 +42,12 @@ function App() {
             password
           </h4>
         </li>
+        <li>
+          <h4>
+            Multer image upload complete -> first added pic to local storage
+            then moved to aws S3 cloud storage
+          </h4>
+        </li>
       </ol>
     </div>
   );
